@@ -13,7 +13,7 @@ def build_cnn_encoder(input_shape):
     """
     CNN feature extractor with 3 operational blocks:
     Conv1D(kernel_size=100) + ReLU + BatchNorm + AvgPool1D(pool=2)
-    Accepts multichannel input, e.g., (3000, 7) for 4 physiological signals 3xEEG,1xEMG,2xEOG,1xECG.
+    Accepts multichannel input, e.g., (3000, 5) for 5 physiological signals 2xEEG,1xEMG,1xEOG,1xECG.
     """
     #HACER UNA CAPA PARA CADA SEÑAL Y ASÍ EXTRAER CARACTERISTICAS DE CADA UNA
     inputs = Input(shape=input_shape)  
