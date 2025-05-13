@@ -9,10 +9,15 @@ Este proyecto implementa un modelo de aprendizaje profundo basado en una arquite
 
 ## Flujo
 1º Carga de archivos .edf con señales fisiológicas y su preprocesamiento
+
 2º Extracción de ventanas de 30s con sus respectivas etiquetas de sueño que se guardan en diccionarios .npz
+
 3º Agrupación de las ventanas en secuencias de longitud L=5
+
 4º Entrada al modelo completo de la forma (shape = [n_secuencias, sequence_length(L=5), 3000(30sx100Hz), n_canales(5)])
+
 5º La CNN procesa cada ventana (3000, 5) y extrae un vector de 50 características hecho secuencialmente (TimeDistributed)
+
 6º La LSTM procesa la secuencia de 5 vectores (sequence_length(L=5), 50) y predice la etapa de sueño.
 
 ## Arquitectura del modelo
@@ -59,21 +64,17 @@ Conv1D espera entradas de la forma (batch_size-->n_ventanas, time_steps-->muestr
 
 ## Estructura del proyecto
 
-sleep-stage-detection/
-│
-├── recordings/ # Archivos .edf originales (no se suben al repo)
-├── pacientes/ # Archivos procesados .npz (no se suben al repo)
-│
-├── modelos/ # Definición del modelo CNN-LSTM
-│ ├── cnn_lstm_model.py
-│
-├── preprocessing/ # Procesamiento de datos y anotaciones
-│ ├── procesado_pacientes.py
-│ ├── dataset_builder.py
-│
-├── train_cnn_lstm_model.py # Script principal de entrenamiento y evaluación
-├── .gitignore
-└── README.md
+sleep-stage-detection
+- recordings/ # Archivos .edf originales (no se suben al repo)
+- pacientes/ # Archivos procesados .npz (no se suben al repo)
+- modelos/ # Definición del modelo CNN-LSTM
+  - cnn_lstm_model.py
+- preprocessing/ # Procesamiento de datos y anotaciones
+  - procesado_pacientes.py
+  - dataset_builder.py
+- train_cnn_lstm_model.py # Script principal de entrenamiento y evaluación
+- .gitignore
+- README.md
 
 ## Requisitos
 
