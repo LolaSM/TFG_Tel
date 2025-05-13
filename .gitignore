@@ -1,0 +1,11 @@
+# Ignorar los archivos de pacientes (datos)
+pacientes/
+recordings/
+*.npz
+
+# Ignorar archivos temporales
+__pycache__/
+*.pyc[cod]
+
+# Ignorar ficheros de sistema
+.DS_Store
