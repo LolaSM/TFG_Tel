@@ -1,13 +1,15 @@
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (
     Input, Conv1D, BatchNormalization, AveragePooling1D,
-    ReLU, Dense, Flatten, LSTM, TimeDistributed
+    ReLU, Dense, GlobalAveragePooling1D, LSTM, TimeDistributed
 )
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from modelos.metrics import F1Score 
 
 def build_cnn_encoder(input_shape):
     """
@@ -19,27 +21,34 @@ def build_cnn_encoder(input_shape):
     inputs = Input(shape=input_shape)  
     x = inputs
     filters = 8
+    #probar con kernel de 50, añadir droput tras la capa Dense(50)
     for _ in range(3):
         x = Conv1D(filters=filters, kernel_size=100, padding='same', strides=1)(x)
         x = ReLU()(x)
         x = BatchNormalization()(x)
         x = AveragePooling1D(pool_size=2, strides=2)(x)
         filters *= 2  # double filters each block
-
-    x = Flatten()(x)
-    x = Dense(50)(x)  # output feature vector of length 50
+        
+    # Ahora x tiene shape (time_steps // 8, filters_final)
+    x = GlobalAveragePooling1D()(x)  # shape → (filters_final,)
+    x = Dense(50, activation='relu')(x)  # feature vector de dimensión 50
+    #x = Dropout(0.5)(x)  # dropout para regularización
 
     model = Model(inputs=inputs, outputs=x, name="CNN_Encoder")
     return model
 
 #test seq_len = 3,5,7
 #5 channels
-def build_cnn_lstm_model(seq_len=5, input_shape=(3000, 5)):
+def build_cnn_lstm_model(seq_len=5, input_shape=(3000, 1)):
     """
-    Builds the full CNN-LSTM model as described in the article.
-    - CNN feature extractor applied on each 30s segment
-    - LSTM takes sequences of feature vectors of length L
-    - Final Dense layer with softmax for 5-class classification
+    Modelo completo CNN-LSTM:
+      - Cada ventana de 30s pasa por build_cnn_encoder → vector de 50
+      - TimeDistributed sobre seq_len ventanas → tensor (seq_len, 50)
+      - Dense final 5 clases softmax
+    
+    The value 3000 refers to the number of time samples in each 30-second segment.
+    For example, if your data is sampled at 100 Hz, then 30 seconds * 100 Hz = 3000 samples.
+    Adjust this value according to your signal's sampling frequency and segment length.
     """
     cnn_encoder = build_cnn_encoder(input_shape)
 
@@ -64,10 +73,12 @@ def compile_model(model):
     """
     #luego probar a cambiar learning_rate u optimizador adam
     optimizer = SGD(learning_rate=0.001, momentum=0.9)
+    #lr=1e-3
+    #optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     model.compile(
         optimizer=optimizer,
         loss='categorical_crossentropy',
-        metrics=['accuracy','f1_score','kappa_score']
+        metrics=['accuracy', F1Score()]
     )
     return model
 
@@ -78,17 +89,20 @@ def get_callbacks():
     """
     early_stopping = EarlyStopping(
         monitor='val_loss',
-        patience=10,
+        patience=15,
         restore_best_weights=True,
         verbose=1
     )
 
     lr_schedule = ReduceLROnPlateau(
         monitor='val_loss',
-        factor=0.1,
-        patience=10,
+        factor=0.5,
+        patience=7,
         min_lr=1e-6,
         verbose=1
     )
 
     return [early_stopping, lr_schedule]
+
+#utilizar tarjeta grafica en entorno distribuido
+
