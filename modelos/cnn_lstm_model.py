@@ -23,7 +23,7 @@ def build_cnn_encoder(input_shape):
     filters = 8
     #probar con kernel de 50, añadir droput tras la capa Dense(50)
     for _ in range(3):
-        x = Conv1D(filters=filters, kernel_size=100, padding='same', strides=1)(x)
+        x = Conv1D(filters=filters, kernel_size=100, padding='same')(x)
         x = ReLU()(x)
         x = BatchNormalization()(x)
         x = AveragePooling1D(pool_size=2, strides=2)(x)
@@ -32,7 +32,7 @@ def build_cnn_encoder(input_shape):
     # Ahora x tiene shape (time_steps // 8, filters_final)
     x = GlobalAveragePooling1D()(x)  # shape → (filters_final,)
     x = Dense(50, activation='relu')(x)  # feature vector de dimensión 50
-    #x = Dropout(0.5)(x)  # dropout para regularización
+    #x = Dropout(0.3)(x)  # dropout para regularización
 
     model = Model(inputs=inputs, outputs=x, name="CNN_Encoder")
     return model
@@ -59,7 +59,7 @@ def build_cnn_lstm_model(seq_len=5, input_shape=(3000, 1)):
     x = TimeDistributed(cnn_encoder)(seq_input)  # → (L, 50)
 
     # LSTM block
-    x = LSTM(100)(x)  # output shape → (100,)
+    x = LSTM(64)(x)  # output shape → (64,)
 
     # Final classification layer
     output = Dense(5, activation='softmax')(x)
@@ -72,7 +72,8 @@ def compile_model(model):
     Compiles model with SGD and learning rate scheduler.
     """
     #luego probar a cambiar learning_rate u optimizador adam
-    optimizer = SGD(learning_rate=0.001, momentum=0.9)
+    #optimizer = SGD(learning_rate=0.001, momentum=0.9)
+    optimizer = "adam"
     #lr=1e-3
     #optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     model.compile(

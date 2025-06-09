@@ -118,6 +118,7 @@ def crear_tf_dataset(path_npz_folder, L=5, batch_size=32, shuffle_buffer=1000):
     )
     # Shuffle + Batch + Prefetch
     train_ds = (train_ds
+                .repeat()
                 .shuffle(shuffle_buffer)
                 .batch(batch_size)
                 .prefetch(tf.data.AUTOTUNE))

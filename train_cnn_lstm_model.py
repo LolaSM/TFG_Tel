@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 RECORDINGS_PATH = "recordings"
 DATASET_PATH = "pacientes"
 SEQ_LENGTH = 5
-BATCH_SIZE = 32 # 64, 128
-EPOCHS = 200 # 100 epochs
-MODEL_PATH = "modelos/CNN_LSTM_5_ECG_200epochs.keras"
+BATCH_SIZE = 64 # 32, 64, 128
+EPOCHS = 100 # 100 epochs
+MODEL_PATH = "modelos/CNN_LSTM_5_ECG_100epochs.keras"
 #canales = ['EEG F4-M1', 'EEG C4-M1', 'EEG O2-M1', 'EEG C3-M2', 'EMG chin', 'EOG E1-M2', 'EOG E2-M2', 'ECG']
 #CANALES_INTERES = [
 #    'EEG C4-M1', 'EEG C3-M2', 'EMG chin', 'EOG E1-M2', 'ECG'

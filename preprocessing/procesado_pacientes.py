@@ -25,13 +25,7 @@ def cargar_datos(nombre_archivo, path):
     """
     archivo_senal   = os.path.join(path, f"{nombre_archivo}.edf")
     archivo_scoring = os.path.join(path, f"{nombre_archivo}_sleepscoring.edf")
-
     raw = mne.io.read_raw_edf(archivo_senal, preload=True, verbose=False)
-
-    # Solo para el primer paciente mostramos los canales disponibles
-    if nombre_archivo == "SN001":
-        print(f"Canales disponibles en {nombre_archivo}: {raw.info['ch_names']}")
-
     anotaciones = mne.read_annotations(archivo_scoring)
     raw.set_annotations(anotaciones)
     return raw
